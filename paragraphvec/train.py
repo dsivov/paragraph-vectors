@@ -9,7 +9,7 @@ from paragraphvec.data import load_dataset, NCEData
 from paragraphvec.loss import NegativeSampling
 from paragraphvec.models import DM, DBOW
 from paragraphvec.utils import save_training_state
-
+from arango import ArangoClient
 
 def start(data_file_name,
           num_noise_words,
@@ -78,6 +78,9 @@ def start(data_file_name,
         Number of batch generator jobs to run in parallel. If value is set
         to -1 number of machine cores are used.
     """
+    db = connect_db("nebula_dev")
+    get_stories_from_db(db)
+
     if model_ver not in ('dm', 'dbow'):
         raise ValueError("Invalid version of the model")
 
@@ -91,7 +94,7 @@ def start(data_file_name,
                              "vectors when using dm")
         if context_size <= 0:
             raise ValueError("Context size must be positive when using dm")
-
+    
     dataset = load_dataset(data_file_name)
     nce_data = NCEData(
         dataset,
@@ -203,6 +206,39 @@ def _run(data_file_name,
 
         epoch_total_time = round(time.time() - epoch_start_time)
         print(" ({:d}s) - loss: {:.4f}".format(epoch_total_time, loss))
+
+def connect_db(dbname):
+    #client = ArangoClient(hosts='http://ec2-18-219-43-150.us-east-2.compute.amazonaws.com:8529')
+    client = ArangoClient(hosts='http://18.159.140.240:8529')
+    db = client.db(dbname, username='nebula', password='nebula')
+    return (db)
+
+def get_stories_from_db(db):
+    from os.path import join, dirname, isfile
+    query = 'FOR doc IN Stories RETURN doc'  
+    stories = []
+    cursor = db.aql.execute(
+            query
+        )
+    _root_dir = dirname(dirname(__file__))
+    
+    DATA_DIR = join(_root_dir, 'data')
+    NEBULA_STORIES_FILE = join(DATA_DIR,"nebula.csv")
+    print("File name", NEBULA_STORIES_FILE)
+    _file = open(NEBULA_STORIES_FILE,'w')
+    _file.truncate()
+    _file.write("text\n")
+    for data in cursor:
+        #print(data)
+        story = "\""
+        for w in data['story'][0]:
+            story = story + " " + w
+        story = story + "\""
+        _file.write(story + "\n")
+    #print (stories)
+   
+    _file.close()
+    return(stories)
 
 
 def _print_progress(epoch_i, batch_i, num_batches):

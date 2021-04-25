@@ -27,6 +27,7 @@ def load_dataset(file_name):
         skip_header=True)
 
     text_field.build_vocab(dataset)
+    
     return dataset
 
 

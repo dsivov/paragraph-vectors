@@ -10,6 +10,7 @@ from paragraphvec.models import DM, DBOW
 from paragraphvec.utils import DATA_DIR, MODELS_DIR
 
 
+
 def start(data_file_name, model_file_name):
     """Saves trained paragraph vectors to a csv file in the *data* directory.
 
@@ -31,7 +32,7 @@ def start(data_file_name, model_file_name):
         vec_dim,
         num_docs=len(dataset),
         num_words=len(dataset.fields['text'].vocab) - 1)
-
+    print(model)
     _write_to_file(data_file_name, model_file_name, model, vec_dim)
 
 

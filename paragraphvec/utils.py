@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 import torch
 
 _root_dir = dirname(dirname(__file__))
-
 DATA_DIR = join(_root_dir, 'data')
 MODELS_DIR = join(_root_dir, 'models')
 _DIAGNOSTICS_DIR = join(_root_dir, 'diagnostics')
@@ -78,14 +77,6 @@ def save_training_state(data_file_name,
         # generate a diagnostic loss plot
         with open(diagnostic_file_path) as f:
             loss_values = [float(l.rstrip()) for l in f.readlines()]
-
-        diagnostic_plot_file_path = diagnostic_file_path[:-3] + 'png'
-        fig = plt.figure()
-        plt.plot(range(1, epoch_i + 2), loss_values, color='r')
-        plt.xlabel('epoch')
-        plt.ylabel('training loss')
-        fig.savefig(diagnostic_plot_file_path, bbox_inches='tight')
-        plt.close()
 
     # save the model
     if model_ver_is_dbow:
