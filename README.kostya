@@ -1,0 +1,2 @@
+python train.py start --data_file_name 'nebula.csv' --num_epochs 100 --batch_size 512 --num_workers 6 --num_noise_words 2 --vec_dim 100 --lr 1e-3
+ython export_vectors.py start --data_file_name 'nebula.csv' --model_file_name 'nebula_model_<version>.pth.tar'
